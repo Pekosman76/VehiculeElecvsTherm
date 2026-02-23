@@ -1,0 +1,110 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Comparateur coût total 5 ans : véhicule électrique vs thermique</title>
+  <meta name="description" content="Simulez le coût total de possession sur 5 ans d'une voiture électrique vs thermique : achat, bonus/malus, énergie, entretien, revente.">
+  <link rel="canonical" href="https://example.com/">
+  <meta property="og:title" content="Comparateur véhicule électrique vs thermique">
+  <meta property="og:description" content="Calculateur statique et rapide du coût total de possession sur 5 ans.">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://example.com/">
+  <meta name="twitter:card" content="summary_large_image">
+  <link rel="stylesheet" href="assets/styles.css">
+  <link rel="manifest" href="site.webmanifest">
+</head>
+<body>
+<header class="site-header">
+  <div class="container nav">
+    <a class="brand" href="index.html">Comparateur VE vs Thermique</a>
+    <nav aria-label="Navigation principale">
+      <ul>
+        <li><a href="index.html#simulateur">Simulateur</a></li>
+        <li><a href="pages/bonus-ecologique.html">Guides</a></li>
+        <li><a href="pages/faq.html">FAQ</a></li>
+        <li><a href="pages/a-propos.html">À propos</a></li>
+      </ul>
+    </nav>
+  </div>
+</header>
+<main class="container">
+  <section class="hero">
+    <h1>Comparateur coût total de possession : Véhicule Électrique vs Thermique</h1>
+    <p>Calculez en direct le coût réel sur 5 ans, comparez le budget mensuel et visualisez à partir de quand l’électrique devient rentable selon votre usage.</p>
+    <a class="btn" href="#simulateur">Lancer le simulateur</a>
+  </section>
+  <div class="ad-slot" aria-label="Emplacement publicitaire">Emplacement Google AdSense (script chargé uniquement avec consentement publicité)</div>
+  <section id="simulateur" class="card">
+    <h2>Simulateur 5 ans</h2>
+    <p class="hint">Barèmes légaux <span data-site-year></span>. Valeurs modifiables dans <code>assets/config.js</code>.</p>
+    <div class="notice"><strong>Avertissement :</strong> résultats indicatifs, pas de valeur légale.</div>
+    <form id="simulator-form">
+      <div class="grid grid-2">
+        <fieldset class="card">
+          <legend>Électrique</legend>
+          <label for="ev-type">Type véhicule</label><select id="ev-type"><option value="citadine">Citadine</option><option value="suv">SUV</option><option value="utilitaire">Utilitaire</option></select>
+          <label for="ev-price">Prix d’achat (€)</label><input id="ev-price" type="number" value="32000">
+          <label for="ev-bonus">Bonus écologique (€)</label><input id="ev-bonus" type="number">
+          <label for="electricity-price">Coût électricité (€/kWh)</label><input id="electricity-price" type="number" step="0.01">
+          <label for="ev-consumption">Conso (kWh/100km)</label><input id="ev-consumption" type="number" step="0.1">
+          <label for="ev-maintenance">Entretien annuel (€)</label><input id="ev-maintenance" type="number">
+          <label for="ev-resale-type">Revente</label><select id="ev-resale-type"><option value="percent">% du prix d’achat</option><option value="value">Valeur fixe €</option></select>
+          <label for="ev-resale">Valeur de revente après 5 ans</label><input id="ev-resale" type="number" value="45">
+          <label for="charger-cost">Installation borne (one-shot €)</label><input id="charger-cost" type="number">
+          <label for="electricity-increase">Hausse annuelle électricité (%)</label><input id="electricity-increase" type="number" step="0.1">
+        </fieldset>
+        <fieldset class="card">
+          <legend>Thermique</legend>
+          <label for="th-type">Type véhicule</label><select id="th-type"><option value="citadine">Citadine</option><option value="suv">SUV</option><option value="utilitaire">Utilitaire</option></select>
+          <label for="th-price">Prix d’achat (€)</label><input id="th-price" type="number" value="26000">
+          <label for="th-malus">Malus écologique (€)</label><input id="th-malus" type="number">
+          <label for="fuel-price">Prix carburant (€/L)</label><input id="fuel-price" type="number" step="0.01">
+          <label for="th-consumption">Conso (L/100km)</label><input id="th-consumption" type="number" step="0.1">
+          <label for="annual-km">Kilométrage annuel (km)</label><input id="annual-km" type="number">
+          <label for="th-maintenance">Entretien annuel (€)</label><input id="th-maintenance" type="number">
+          <label for="th-resale-type">Revente</label><select id="th-resale-type"><option value="percent">% du prix d’achat</option><option value="value">Valeur fixe €</option></select>
+          <label for="th-resale">Valeur de revente après 5 ans</label><input id="th-resale" type="number" value="45">
+          <label for="fuel-increase">Hausse annuelle carburant (%)</label><input id="fuel-increase" type="number" step="0.1">
+        </fieldset>
+      </div>
+    </form>
+  </section>
+  <section class="card">
+    <h2>Résultats</h2>
+    <table class="table"><thead><tr><th>Indicateur</th><th>Électrique</th><th>Thermique</th></tr></thead><tbody>
+      <tr><td>Coût total 5 ans</td><td id="ev-total"></td><td id="th-total"></td></tr>
+      <tr><td>Coût mensuel moyen</td><td id="ev-monthly"></td><td id="th-monthly"></td></tr>
+    </tbody></table>
+    <div id="result-summary" class="result-summary"><p><strong id="winner"></strong> Écart : <span id="difference"></span>.</p><p id="breakeven"></p></div>
+    <canvas id="result-chart" width="380" height="220" aria-label="Graphique comparatif" role="img"></canvas>
+  </section>
+  <section class="card">
+    <h2>Aller plus loin</h2>
+    <ul>
+      <li><a href="pages/bonus-ecologique.html">Comprendre le bonus écologique</a></li>
+      <li><a href="pages/malus-ecologique.html">Comprendre le malus écologique</a></li>
+      <li><a href="pages/cout-recharge-domicile.html">Coût de recharge à domicile</a></li>
+    </ul>
+  </section>
+</main>
+<footer class="site-footer">
+  <div class="container">
+    <p data-legal-short></p>
+    <p><a href="pages/mentions-legales.html">Mentions légales</a> · <a href="pages/politique-confidentialite.html">Politique de confidentialité</a> · <a href="pages/contact.html">Contact</a> · <a href="#" id="manage-cookies">Gérer les cookies</a></p>
+    <p>Contact : <a href="mailto:laloumaxime951@gmail.com">laloumaxime951@gmail.com</a></p>
+    <p>Hébergement : OVHcloud SAS – 2 rue Kellermann, 59100 Roubaix – France.</p>
+  </div>
+</footer>
+<div id="cookie-banner" class="cookie-banner" hidden>
+  <p>Ce site utilise des cookies (notamment Google AdSense) pour diffuser des annonces et mesurer l’audience. Vous pouvez accepter ou refuser. <a href="pages/politique-confidentialite.html">En savoir plus</a></p>
+  <div class="cookie-actions"><button id="cookie-accept" class="btn">Accepter</button><button id="cookie-reject" class="btn secondary">Refuser</button></div>
+</div>
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"WebSite","name":"Comparateur VE vs Thermique","url":"https://example.com/"}</script>
+<script src="assets/config.js"></script>
+<script src="assets/utils.js"></script>
+<script src="assets/seo.js"></script>
+<script src="assets/cookies.js"></script>
+<script src="assets/app.js"></script>
+</body>
+</html>
