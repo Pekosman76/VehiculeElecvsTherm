@@ -3,7 +3,7 @@ window.APP_CONFIG = {
   BASE_URL: "https://example.com/",
   SITE_YEAR: 2026,
   NEXT_YEAR: 2027,
-  LEGAL_NOTICE_SHORT: "HOP. Outil indicatif basé sur les barèmes légaux {SITE_YEAR}. Seule la CAF/MSA peut valider vos droits.",
+  LEGAL_NOTICE_SHORT: "Outil indicatif basé sur les barèmes légaux {SITE_YEAR}. Seule la CAF / MSA peut valider vos droits.",
   defaults: {
     years: 5,
     electricityPrice: 0.25,

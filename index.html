@@ -34,10 +34,10 @@
     <p>Calculez en direct le coût réel sur 5 ans, comparez le budget mensuel et visualisez à partir de quand l’électrique devient rentable selon votre usage.</p>
     <a class="btn" href="#simulateur">Lancer le simulateur</a>
   </section>
-  <div class="ad-slot" aria-label="Emplacement publicitaire">Emplacement Google AdSense (script chargé uniquement avec consentement publicité)</div>
+  <div id="adsense-container"></div>
   <section id="simulateur" class="card">
     <h2>Simulateur 5 ans</h2>
-    <p class="hint">Barèmes légaux <span data-site-year></span>. Valeurs modifiables dans <code>assets/config.js</code>.</p>
+    <p class="simu-info">Barèmes légaux <span data-site-year></span> — valeurs par défaut modifiables dans <code>assets/config.js</code>.</p>
     <div class="notice"><strong>Avertissement :</strong> résultats indicatifs, pas de valeur légale.</div>
     <form id="simulator-form">
       <div class="grid grid-2">
@@ -91,13 +91,13 @@
 <footer class="site-footer">
   <div class="container">
     <p data-legal-short></p>
-    <p><a href="pages/mentions-legales.html">Mentions légales</a> · <a href="pages/politique-confidentialite.html">Politique de confidentialité</a> · <a href="pages/contact.html">Contact</a> · <a href="#" id="manage-cookies">Gérer les cookies</a></p>
-    <p>Contact : <a href="mailto:laloumaxime951@gmail.com">laloumaxime951@gmail.com</a></p>
+    <p><a href="pages/mentions-legales.html">Mentions légales</a> · <a href="pages/politique-confidentialite.html">Politique de confidentialité</a> · <a href="pages/contact.html">Contact</a> · <a href="#" data-manage-cookies>Gérer les cookies</a></p>
+    <p class="footer-contact">📩 Contact / Support : <a href="mailto:laloumaxime951@gmail.com">laloumaxime951@gmail.com</a></p>
     <p>Hébergement : OVHcloud SAS – 2 rue Kellermann, 59100 Roubaix – France.</p>
   </div>
 </footer>
-<div id="cookie-banner" class="cookie-banner" hidden>
-  <p>Ce site utilise des cookies (notamment Google AdSense) pour diffuser des annonces et mesurer l’audience. Vous pouvez accepter ou refuser. <a href="pages/politique-confidentialite.html">En savoir plus</a></p>
+<div id="cookie-banner" class="cookie-banner" aria-live="polite" aria-hidden="true" hidden>
+  <p>Ce site utilise des cookies publicitaires (AdSense) et de mesure d’audience. Vous pouvez accepter ou refuser. <a href="pages/politique-confidentialite.html">En savoir plus</a></p>
   <div class="cookie-actions"><button id="cookie-accept" class="btn">Accepter</button><button id="cookie-reject" class="btn secondary">Refuser</button></div>
 </div>
 <script type="application/ld+json">{"@context":"https://schema.org","@type":"WebSite","name":"Comparateur VE vs Thermique","url":"https://example.com/"}</script>
