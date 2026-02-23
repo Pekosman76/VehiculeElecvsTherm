@@ -2,136 +2,187 @@
   const cfg = window.APP_CONFIG;
   if (!cfg) return;
 
+  function byId(id) {
+    return document.getElementById(id);
+  }
+
   function setByType(prefix, type) {
-    const p = cfg.presets[type];
-    if (!p) return;
+    const preset = cfg.presets[type];
+    if (!preset) return;
+
     if (prefix === 'ev') {
-      Utils.byId('ev-consumption').value = p.evConsumption;
-      Utils.byId('ev-maintenance').value = p.evMaintenance;
-      Utils.byId('ev-resale').value = p.resalePercent;
+      byId('ev-consumption').value = preset.evConsumption;
+      byId('ev-maintenance').value = preset.evMaintenance;
+      byId('ev-resale').value = preset.resalePercent;
     } else {
-      Utils.byId('th-consumption').value = p.thermalConsumption;
-      Utils.byId('th-maintenance').value = p.thermalMaintenance;
-      Utils.byId('th-resale').value = p.resalePercent;
+      byId('th-consumption').value = preset.thermalConsumption;
+      byId('th-maintenance').value = preset.thermalMaintenance;
+      byId('th-resale').value = preset.resalePercent;
     }
   }
 
-  function computeEnergy(km, consumption, unitPrice, annualIncrease, years = cfg.defaults.years) {
+  function computeEnergy(km, consumption, unitPrice, annualIncrease, years) {
     let total = 0;
-    let price = Number(unitPrice);
+    let dynamicPrice = Number(unitPrice);
     for (let i = 0; i < years; i += 1) {
-      total += (km / 100) * consumption * price;
-      price *= (1 + annualIncrease / 100);
+      total += (km / 100) * consumption * dynamicPrice;
+      dynamicPrice *= 1 + annualIncrease / 100;
     }
     return total;
   }
 
-  function totalCost(data, years = cfg.defaults.years) {
-    const resale = data.resaleType === 'percent' ? data.purchasePrice * (data.resaleValue / 100) : data.resaleValue;
-    const energy = computeEnergy(data.annualKm, data.consumption, data.energyPrice, data.energyIncrease, years);
+  function totalCost(data, years) {
+    const resale = data.resaleType === 'percent'
+      ? data.purchasePrice * (data.resaleValue / 100)
+      : data.resaleValue;
+
+    const energy = computeEnergy(
+      data.annualKm,
+      data.consumption,
+      data.energyPrice,
+      data.energyIncrease,
+      years
+    );
+
     const maintenance = data.maintenance * years;
-    return data.purchasePrice + data.adjustment + energy + maintenance + data.oneshot - resale;
+    return data.purchasePrice + data.adjustment + data.oneshot + energy + maintenance - resale;
   }
 
   function breakEven(evData, thData) {
-    const kmPerYear = evData.annualKm;
-    for (let year = 1; year <= 10; year += 1) {
-      const ev = totalCost(evData, year);
-      const th = totalCost(thData, year);
-      if (ev <= th) {
-        return { year, km: year * kmPerYear };
+    const maxYears = 10;
+    for (let year = 1; year <= maxYears; year += 1) {
+      const evCost = totalCost(evData, year);
+      const thCost = totalCost(thData, year);
+      if (evCost <= thCost) {
+        return { year, km: year * evData.annualKm };
       }
     }
     return null;
   }
 
   function renderBarChart(ev, th) {
-    const canvas = Utils.byId('result-chart');
+    const canvas = byId('result-chart');
     if (!canvas) return;
     const ctx = canvas.getContext('2d');
     const max = Math.max(ev, th) || 1;
+
     ctx.clearRect(0, 0, canvas.width, canvas.height);
-    const baseY = 180;
-    const h1 = (ev / max) * 140;
-    const h2 = (th / max) * 140;
-    ctx.fillStyle = '#2563eb';
-    ctx.fillRect(70, baseY - h1, 90, h1);
-    ctx.fillStyle = '#ef4444';
-    ctx.fillRect(220, baseY - h2, 90, h2);
-    ctx.fillStyle = '#0f172a';
-    ctx.font = '14px sans-serif';
-    ctx.fillText('Électrique', 72, 200);
-    ctx.fillText('Thermique', 222, 200);
+
+    const chartTop = 24;
+    const chartBottom = 220;
+    const chartHeight = chartBottom - chartTop;
+
+    const evHeight = (ev / max) * (chartHeight - 22);
+    const thHeight = (th / max) * (chartHeight - 22);
+
+    ctx.fillStyle = '#f1f5f9';
+    ctx.fillRect(20, chartTop, canvas.width - 40, chartHeight);
+
+    const gradientEv = ctx.createLinearGradient(0, chartBottom - evHeight, 0, chartBottom);
+    gradientEv.addColorStop(0, '#1E2A78');
+    gradientEv.addColorStop(1, '#007BFF');
+    const gradientTh = ctx.createLinearGradient(0, chartBottom - thHeight, 0, chartBottom);
+    gradientTh.addColorStop(0, '#9f1239');
+    gradientTh.addColorStop(1, '#ef4444');
+
+    ctx.fillStyle = gradientEv;
+    ctx.fillRect(85, chartBottom - evHeight, 90, evHeight);
+    ctx.fillStyle = gradientTh;
+    ctx.fillRect(235, chartBottom - thHeight, 90, thHeight);
+
+    ctx.fillStyle = '#111';
+    ctx.font = '600 14px Inter, sans-serif';
+    ctx.fillText('Électrique', 92, 245);
+    ctx.fillText('Thermique', 242, 245);
+
+    ctx.font = '500 12px Inter, sans-serif';
+    ctx.fillText(`${Math.round(ev).toLocaleString('fr-FR')} €`, 86, chartBottom - evHeight - 8);
+    ctx.fillText(`${Math.round(th).toLocaleString('fr-FR')} €`, 236, chartBottom - thHeight - 8);
+  }
+
+  function updateDetails(evData, thData, years) {
+    const evEnergy = computeEnergy(evData.annualKm, evData.consumption, evData.energyPrice, evData.energyIncrease, years);
+    const thEnergy = computeEnergy(thData.annualKm, thData.consumption, thData.energyPrice, thData.energyIncrease, years);
+
+    byId('ev-energy-detail').textContent = Utils.toCurrency(evEnergy);
+    byId('th-energy-detail').textContent = Utils.toCurrency(thEnergy);
+    byId('ev-maint-detail').textContent = Utils.toCurrency(evData.maintenance * years);
+    byId('th-maint-detail').textContent = Utils.toCurrency(thData.maintenance * years);
   }
 
   function calculateAndRender() {
-    const annualKm = Number(Utils.byId('annual-km').value || 0);
+    const years = Math.min(10, Math.max(1, Number(byId('years').value || cfg.defaults.years)));
+    byId('years').value = years;
+    const annualKm = Number(byId('annual-km').value || 0);
+
     const evData = {
-      purchasePrice: Number(Utils.byId('ev-price').value || 0),
-      adjustment: -Number(Utils.byId('ev-bonus').value || 0),
-      energyPrice: Number(Utils.byId('electricity-price').value || 0),
-      consumption: Number(Utils.byId('ev-consumption').value || 0),
+      purchasePrice: Number(byId('ev-price').value || 0),
+      adjustment: -Number(byId('ev-bonus').value || 0),
+      energyPrice: Number(byId('electricity-price').value || 0),
+      consumption: Number(byId('ev-consumption').value || 0),
       annualKm,
-      maintenance: Number(Utils.byId('ev-maintenance').value || 0),
-      resaleType: Utils.byId('ev-resale-type').value,
-      resaleValue: Number(Utils.byId('ev-resale').value || 0),
-      oneshot: Number(Utils.byId('charger-cost').value || 0),
-      energyIncrease: Number(Utils.byId('electricity-increase').value || 0)
+      maintenance: Number(byId('ev-maintenance').value || 0),
+      resaleType: byId('ev-resale-type').value,
+      resaleValue: Number(byId('ev-resale').value || 0),
+      oneshot: Number(byId('charger-cost').value || 0),
+      energyIncrease: Number(byId('electricity-increase').value || 0)
     };
+
     const thData = {
-      purchasePrice: Number(Utils.byId('th-price').value || 0),
-      adjustment: Number(Utils.byId('th-malus').value || 0),
-      energyPrice: Number(Utils.byId('fuel-price').value || 0),
-      consumption: Number(Utils.byId('th-consumption').value || 0),
+      purchasePrice: Number(byId('th-price').value || 0),
+      adjustment: Number(byId('th-malus').value || 0),
+      energyPrice: Number(byId('fuel-price').value || 0),
+      consumption: Number(byId('th-consumption').value || 0),
       annualKm,
-      maintenance: Number(Utils.byId('th-maintenance').value || 0),
-      resaleType: Utils.byId('th-resale-type').value,
-      resaleValue: Number(Utils.byId('th-resale').value || 0),
+      maintenance: Number(byId('th-maintenance').value || 0),
+      resaleType: byId('th-resale-type').value,
+      resaleValue: Number(byId('th-resale').value || 0),
       oneshot: 0,
-      energyIncrease: Number(Utils.byId('fuel-increase').value || 0)
+      energyIncrease: Number(byId('fuel-increase').value || 0)
     };
 
-    const evTotal = totalCost(evData);
-    const thTotal = totalCost(thData);
+    const evTotal = totalCost(evData, years);
+    const thTotal = totalCost(thData, years);
 
-    Utils.byId('ev-total').textContent = Utils.toCurrency(evTotal);
-    Utils.byId('th-total').textContent = Utils.toCurrency(thTotal);
-    Utils.byId('ev-monthly').textContent = Utils.toCurrency(evTotal / 60);
-    Utils.byId('th-monthly').textContent = Utils.toCurrency(thTotal / 60);
-    Utils.byId('difference').textContent = Utils.toCurrency(Math.abs(evTotal - thTotal));
-    Utils.byId('winner').textContent = evTotal <= thTotal ? 'L’électrique est plus économique sur 5 ans.' : 'Le thermique est plus économique sur 5 ans.';
+    byId('ev-total').textContent = Utils.toCurrency(evTotal);
+    byId('th-total').textContent = Utils.toCurrency(thTotal);
+    byId('ev-monthly').textContent = Utils.toCurrency(evTotal / (years * 12));
+    byId('th-monthly').textContent = Utils.toCurrency(thTotal / (years * 12));
+
+    byId('period-label').textContent = `${years} an${years > 1 ? 's' : ''}`;
+    byId('difference').textContent = Utils.toCurrency(Math.abs(evTotal - thTotal));
+    byId('winner').textContent = evTotal <= thTotal
+      ? `Sur ${years} ans, le véhicule électrique est le plus économique.`
+      : `Sur ${years} ans, le véhicule thermique reste le plus économique.`;
 
     const be = breakEven(evData, thData);
-    Utils.byId('breakeven').textContent = be ? `Rentable à partir de ${be.year} an(s), environ ${be.km.toLocaleString('fr-FR')} km.` : 'Non atteint en 10 ans.';
+    byId('breakeven').textContent = be
+      ? `Rentable à partir de ${be.year} an(s), soit environ ${be.km.toLocaleString('fr-FR')} km.`
+      : 'Rentable à partir de… non atteint dans la limite de 10 ans avec ces hypothèses.';
 
-    const summary = Utils.byId('result-summary');
-    if (summary) {
-      summary.classList.remove('result-summary');
-      void summary.offsetWidth;
-      summary.classList.add('result-summary');
-    }
-
+    updateDetails(evData, thData, years);
     renderBarChart(evTotal, thTotal);
   }
 
   document.addEventListener('DOMContentLoaded', () => {
     if (!document.getElementById('simulator-form')) return;
 
-    Utils.byId('annual-km').value = cfg.defaults.annualKm;
-    Utils.byId('electricity-price').value = cfg.defaults.electricityPrice;
-    Utils.byId('fuel-price').value = cfg.defaults.fuelPrice;
-    Utils.byId('ev-bonus').value = cfg.defaults.ecologicalBonus;
-    Utils.byId('th-malus').value = cfg.defaults.ecologicalMalus;
-    Utils.byId('charger-cost').value = cfg.defaults.chargerInstallCost;
-    Utils.byId('electricity-increase').value = cfg.defaults.annualElectricityIncrease;
-    Utils.byId('fuel-increase').value = cfg.defaults.annualFuelIncrease;
+    byId('years').value = cfg.defaults.years;
+    byId('annual-km').value = cfg.defaults.annualKm;
+    byId('electricity-price').value = cfg.defaults.electricityPrice;
+    byId('fuel-price').value = cfg.defaults.fuelPrice;
+    byId('ev-bonus').value = cfg.defaults.ecologicalBonus;
+    byId('th-malus').value = cfg.defaults.ecologicalMalus;
+    byId('charger-cost').value = cfg.defaults.chargerInstallCost;
+    byId('electricity-increase').value = cfg.defaults.annualElectricityIncrease;
+    byId('fuel-increase').value = cfg.defaults.annualFuelIncrease;
 
-    setByType('ev', Utils.byId('ev-type').value);
-    setByType('th', Utils.byId('th-type').value);
+    setByType('ev', byId('ev-type').value);
+    setByType('th', byId('th-type').value);
 
-    document.querySelectorAll('#simulator-form input, #simulator-form select').forEach((el) => {
-      el.addEventListener('input', calculateAndRender);
-      el.addEventListener('change', (event) => {
+    document.querySelectorAll('#simulator-form input, #simulator-form select').forEach((field) => {
+      field.addEventListener('input', calculateAndRender);
+      field.addEventListener('change', (event) => {
         if (event.target.id === 'ev-type') setByType('ev', event.target.value);
         if (event.target.id === 'th-type') setByType('th', event.target.value);
         calculateAndRender();

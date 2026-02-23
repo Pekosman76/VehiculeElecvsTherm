@@ -30,7 +30,7 @@
   function renderAdSlot() {
     const cfg = window.APP_CONFIG?.adsense;
     const container = document.getElementById('adsense-container');
-    if (!container || container.childElementCount > 0 || !cfg?.slotHomeTop) return;
+    if (!container || container.childElementCount > 0 || !cfg?.slotHomeTop || !cfg?.clientId) return;
 
     const ad = document.createElement('ins');
     ad.className = 'adsbygoogle';
@@ -39,8 +39,7 @@
     ad.dataset.adSlot = cfg.slotHomeTop;
     ad.dataset.adFormat = 'auto';
     ad.dataset.fullWidthResponsive = 'true';
-    ad.setAttribute('aria-label', 'Publicité');
-
+    ad.setAttribute('aria-label', 'Publicité contextuelle');
     container.appendChild(ad);
   }
 
@@ -50,8 +49,8 @@
 
     renderAdSlot();
 
-    const alreadyLoaded = document.querySelector('script[data-adsense="1"]');
-    if (alreadyLoaded) {
+    const loaded = document.querySelector('script[data-adsense="1"]');
+    if (loaded) {
       if (window.adsbygoogle && window.adsbygoogle.push) {
         window.adsbygoogle.push({});
       }
@@ -68,7 +67,6 @@
         window.adsbygoogle.push({});
       }
     };
-
     document.head.appendChild(script);
   };
 
