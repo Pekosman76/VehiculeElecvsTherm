@@ -3,11 +3,11 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
-  <title>Comparateur coût total 5 ans : véhicule électrique vs thermique</title>
-  <meta name="description" content="Simulez le coût total de possession sur 5 ans d'une voiture électrique vs thermique : achat, bonus/malus, énergie, entretien, revente.">
+  <title>Comparateur coût total de possession VE vs thermique | Simulateur 1 à 10 ans</title>
+  <meta name="description" content="Comparez le coût total de possession d'une voiture électrique et thermique sur 1 à 10 ans : énergie, entretien, revente, bonus, malus et point de rentabilité.">
   <link rel="canonical" href="https://example.com/">
-  <meta property="og:title" content="Comparateur véhicule électrique vs thermique">
-  <meta property="og:description" content="Calculateur statique et rapide du coût total de possession sur 5 ans.">
+  <meta property="og:title" content="Comparateur coût total de possession : VE vs thermique">
+  <meta property="og:description" content="Un simulateur clair, mobile-first et pédagogique pour comparer électrique et thermique sur votre horizon réel.">
   <meta property="og:type" content="website">
   <meta property="og:url" content="https://example.com/">
   <meta name="twitter:card" content="summary_large_image">
@@ -20,74 +20,166 @@
     <a class="brand" href="index.html">Comparateur VE vs Thermique</a>
     <nav aria-label="Navigation principale">
       <ul>
-        <li><a href="index.html#simulateur">Simulateur</a></li>
+        <li><a href="#simulateur">Simulateur</a></li>
+        <li><a href="pages/simulateur.html">Version dédiée</a></li>
         <li><a href="pages/bonus-ecologique.html">Guides</a></li>
         <li><a href="pages/faq.html">FAQ</a></li>
-        <li><a href="pages/a-propos.html">À propos</a></li>
       </ul>
     </nav>
   </div>
 </header>
-<main class="container">
+
+<main class="container" id="contenu-principal">
   <section class="hero">
     <h1>Comparateur coût total de possession : Véhicule Électrique vs Thermique</h1>
-    <p>Calculez en direct le coût réel sur 5 ans, comparez le budget mensuel et visualisez à partir de quand l’électrique devient rentable selon votre usage.</p>
+    <p>Calculez votre budget auto réel, de 1 à 10 ans, pour savoir quelle motorisation est la plus adaptée à votre usage et à votre portefeuille.</p>
     <a class="btn" href="#simulateur">Lancer le simulateur</a>
   </section>
-  <div id="adsense-container"></div>
-  <section id="simulateur" class="card">
-    <h2>Simulateur 5 ans</h2>
-    <p class="simu-info">Barèmes légaux <span data-site-year></span> — valeurs par défaut modifiables dans <code>assets/config.js</code>.</p>
-    <div class="notice"><strong>Avertissement :</strong> résultats indicatifs, pas de valeur légale.</div>
-    <form id="simulator-form">
+
+  <section class="section-soft" aria-labelledby="intro-title">
+    <h2 id="intro-title">Pourquoi ce comparateur est utile pour tous les profils d’automobilistes</h2>
+    <p>Quand on achète une voiture, on regarde souvent d’abord le prix affiché. Pourtant, ce n’est qu’une partie du coût réel. Entre les dépenses d’énergie, l’entretien, les taxes, les aides, la décote à la revente et les usages quotidiens, la différence finale peut être très importante. Ce comparateur a été conçu pour aider les particuliers, les familles, les jeunes actifs, les indépendants et les petites entreprises à prendre une décision plus éclairée. L’objectif n’est pas de pousser une technologie contre une autre, mais de poser des chiffres concrets sur des situations de conduite bien réelles.</p>
+    <p>Le principe est simple : vous saisissez vos hypothèses dans un simulateur lisible, puis vous obtenez un coût total de possession qui agrège les principaux postes de dépense. Vous pouvez par exemple définir votre kilométrage annuel, le prix de l’électricité et du carburant, la consommation moyenne, les coûts d’entretien, les valeurs de revente et les éléments liés à la fiscalité écologique. Le comparateur tient aussi compte des bonus et malus, afin d’éviter les calculs incomplets qui faussent les arbitrages. L’intérêt majeur est de pouvoir tester rapidement plusieurs scénarios : usage urbain, mixte, autoroute, faible ou fort kilométrage.</p>
+    <p>Notre approche reste volontairement pédagogique. Les résultats affichés sont des estimations et non des promesses. Ils servent à structurer une réflexion, à préparer un budget, ou à vérifier si une offre commerciale est cohérente. Ce positionnement est particulièrement important dans un contexte où les prix de l’énergie peuvent évoluer d’une année à l’autre, où les aides publiques changent, et où le marché de l’occasion se transforme rapidement. C’est pourquoi vous pouvez choisir un horizon de calcul de 1 à 10 ans : un véhicule peut être moins avantageux à court terme, mais plus compétitif au fil du temps, ou l’inverse selon les paramètres.</p>
+    <p>Enfin, ce site est pensé pour rester accessible : lecture simple, champs explicites, infobulles d’aide, fonctionnement sans inscription et sans dépendance technique complexe. Vous pouvez utiliser le simulateur même en refusant les cookies publicitaires. En résumé, ce comparateur vous aide à répondre à une question très pratique : « Dans mon cas précis, quel véhicule me coûte vraiment le moins cher sur la durée ? ».</p>
+  </section>
+
+  <div id="adsense-container" aria-live="polite"></div>
+
+  <section id="simulateur" class="card" aria-labelledby="sim-title">
+    <h2 id="sim-title">Simulateur de coût total (1 à 10 ans)</h2>
+    <p class="simu-info">Barèmes indicatifs <span data-site-year></span> — Paramètres par défaut optimisés selon usages courants.</p>
+    <p class="notice"><strong>Important :</strong> il s'agit d'un outil d'aide à la décision. Vérifiez toujours les aides et barèmes officiels avant achat.</p>
+
+    <form id="simulator-form" aria-describedby="sim-help">
+      <p id="sim-help">Renseignez vos données. Chaque champ propose un repère contextuel via l’icône <strong>?</strong>.</p>
       <div class="grid grid-2">
-        <fieldset class="card">
-          <legend>Électrique</legend>
-          <label for="ev-type">Type véhicule</label><select id="ev-type"><option value="citadine">Citadine</option><option value="suv">SUV</option><option value="utilitaire">Utilitaire</option></select>
-          <label for="ev-price">Prix d’achat (€)</label><input id="ev-price" type="number" value="32000">
-          <label for="ev-bonus">Bonus écologique (€)</label><input id="ev-bonus" type="number">
-          <label for="electricity-price">Coût électricité (€/kWh)</label><input id="electricity-price" type="number" step="0.01">
-          <label for="ev-consumption">Conso (kWh/100km)</label><input id="ev-consumption" type="number" step="0.1">
-          <label for="ev-maintenance">Entretien annuel (€)</label><input id="ev-maintenance" type="number">
-          <label for="ev-resale-type">Revente</label><select id="ev-resale-type"><option value="percent">% du prix d’achat</option><option value="value">Valeur fixe €</option></select>
-          <label for="ev-resale">Valeur de revente après 5 ans</label><input id="ev-resale" type="number" value="45">
-          <label for="charger-cost">Installation borne (one-shot €)</label><input id="charger-cost" type="number">
+        <section class="card form-card" aria-labelledby="hypotheses-title">
+          <h3 id="hypotheses-title">Hypothèses</h3>
+
+          <label for="years" class="field-help">Horizon de calcul (années)
+            <button type="button" class="tooltip" aria-label="Aide horizon de calcul" data-tip="Choisissez une période de 1 à 10 ans pour observer la rentabilité réelle.">?</button>
+          </label>
+          <input id="years" type="number" min="1" max="10" value="5">
+
+          <label for="annual-km" class="field-help">Kilométrage annuel (km)
+            <button type="button" class="tooltip" aria-label="Aide kilométrage annuel" data-tip="Le kilométrage est souvent le facteur principal de rentabilité de l'électrique.">?</button>
+          </label>
+          <input id="annual-km" type="number">
+
+          <label for="ev-type">Type de véhicule électrique</label>
+          <select id="ev-type"><option value="citadine">Citadine</option><option value="suv">SUV</option><option value="utilitaire">Utilitaire</option></select>
+
+          <label for="th-type">Type de véhicule thermique</label>
+          <select id="th-type"><option value="citadine">Citadine</option><option value="suv">SUV</option><option value="utilitaire">Utilitaire</option></select>
+
+          <label for="ev-price">Prix d’achat VE (€)</label><input id="ev-price" type="number" value="32000">
+          <label for="th-price">Prix d’achat thermique (€)</label><input id="th-price" type="number" value="26000">
+          <label for="ev-bonus">Bonus écologique VE (€)</label><input id="ev-bonus" type="number">
+          <label for="th-malus">Malus écologique thermique (€)</label><input id="th-malus" type="number">
+        </section>
+
+        <section class="card form-card" aria-labelledby="energie-title">
+          <h3 id="energie-title">Énergie</h3>
+          <label for="electricity-price">Prix électricité (€/kWh)</label><input id="electricity-price" type="number" step="0.01">
+          <label for="ev-consumption">Conso VE (kWh/100 km)</label><input id="ev-consumption" type="number" step="0.1">
           <label for="electricity-increase">Hausse annuelle électricité (%)</label><input id="electricity-increase" type="number" step="0.1">
-        </fieldset>
-        <fieldset class="card">
-          <legend>Thermique</legend>
-          <label for="th-type">Type véhicule</label><select id="th-type"><option value="citadine">Citadine</option><option value="suv">SUV</option><option value="utilitaire">Utilitaire</option></select>
-          <label for="th-price">Prix d’achat (€)</label><input id="th-price" type="number" value="26000">
-          <label for="th-malus">Malus écologique (€)</label><input id="th-malus" type="number">
+          <label for="charger-cost">Installation borne (coût unique €)</label><input id="charger-cost" type="number">
+
           <label for="fuel-price">Prix carburant (€/L)</label><input id="fuel-price" type="number" step="0.01">
-          <label for="th-consumption">Conso (L/100km)</label><input id="th-consumption" type="number" step="0.1">
-          <label for="annual-km">Kilométrage annuel (km)</label><input id="annual-km" type="number">
-          <label for="th-maintenance">Entretien annuel (€)</label><input id="th-maintenance" type="number">
-          <label for="th-resale-type">Revente</label><select id="th-resale-type"><option value="percent">% du prix d’achat</option><option value="value">Valeur fixe €</option></select>
-          <label for="th-resale">Valeur de revente après 5 ans</label><input id="th-resale" type="number" value="45">
+          <label for="th-consumption">Conso thermique (L/100 km)</label><input id="th-consumption" type="number" step="0.1">
           <label for="fuel-increase">Hausse annuelle carburant (%)</label><input id="fuel-increase" type="number" step="0.1">
-        </fieldset>
+        </section>
+      </div>
+
+      <div class="grid grid-2">
+        <section class="card form-card" aria-labelledby="entretien-title">
+          <h3 id="entretien-title">Entretien</h3>
+          <label for="ev-maintenance">Entretien annuel VE (€)</label><input id="ev-maintenance" type="number">
+          <label for="th-maintenance">Entretien annuel thermique (€)</label><input id="th-maintenance" type="number">
+        </section>
+
+        <section class="card form-card" aria-labelledby="revente-title">
+          <h3 id="revente-title">Revente</h3>
+          <label for="ev-resale-type">Revente VE</label><select id="ev-resale-type"><option value="percent">% du prix d’achat</option><option value="value">Valeur fixe €</option></select>
+          <label for="ev-resale">Valeur revente VE</label><input id="ev-resale" type="number" value="45">
+          <label for="th-resale-type">Revente thermique</label><select id="th-resale-type"><option value="percent">% du prix d’achat</option><option value="value">Valeur fixe €</option></select>
+          <label for="th-resale">Valeur revente thermique</label><input id="th-resale" type="number" value="45">
+        </section>
       </div>
     </form>
   </section>
-  <section class="card">
-    <h2>Résultats</h2>
-    <table class="table"><thead><tr><th>Indicateur</th><th>Électrique</th><th>Thermique</th></tr></thead><tbody>
-      <tr><td>Coût total 5 ans</td><td id="ev-total"></td><td id="th-total"></td></tr>
-      <tr><td>Coût mensuel moyen</td><td id="ev-monthly"></td><td id="th-monthly"></td></tr>
-    </tbody></table>
-    <div id="result-summary" class="result-summary"><p><strong id="winner"></strong> Écart : <span id="difference"></span>.</p><p id="breakeven"></p></div>
-    <canvas id="result-chart" width="380" height="220" aria-label="Graphique comparatif" role="img"></canvas>
+
+  <section class="card" aria-labelledby="results-title">
+    <h2 id="results-title">Résultats</h2>
+    <div class="result-highlight">
+      <p id="winner"></p>
+      <p><strong>Écart estimé :</strong> <span id="difference"></span>.</p>
+      <p id="breakeven"></p>
+    </div>
+
+    <table class="table">
+      <thead><tr><th>Indicateur</th><th>Électrique</th><th>Thermique</th></tr></thead>
+      <tbody>
+        <tr><td>Coût total sur <span id="period-label">5 ans</span></td><td id="ev-total"></td><td id="th-total"></td></tr>
+        <tr><td>Coût mensuel moyen</td><td id="ev-monthly"></td><td id="th-monthly"></td></tr>
+      </tbody>
+    </table>
+
+    <details>
+      <summary>Afficher les détails du calcul</summary>
+      <table class="table">
+        <thead><tr><th>Poste</th><th>Électrique</th><th>Thermique</th></tr></thead>
+        <tbody>
+          <tr><td>Énergie cumulée</td><td id="ev-energy-detail"></td><td id="th-energy-detail"></td></tr>
+          <tr><td>Entretien cumulé</td><td id="ev-maint-detail"></td><td id="th-maint-detail"></td></tr>
+        </tbody>
+      </table>
+    </details>
+
+    <canvas id="result-chart" width="420" height="260" aria-label="Graphique en barres de comparaison des coûts" role="img"></canvas>
   </section>
-  <section class="card">
-    <h2>Aller plus loin</h2>
+
+  <section class="section-soft" aria-labelledby="method-title">
+    <h2 id="method-title">Comment le coût total est calculé (méthode transparente)</h2>
     <ul>
-      <li><a href="pages/bonus-ecologique.html">Comprendre le bonus écologique</a></li>
-      <li><a href="pages/malus-ecologique.html">Comprendre le malus écologique</a></li>
-      <li><a href="pages/cout-recharge-domicile.html">Coût de recharge à domicile</a></li>
+      <li><strong>Énergie :</strong> kilométrage annuel × consommation × prix unitaire, puis projection annuelle avec variation de prix.</li>
+      <li><strong>Entretien :</strong> coût annuel multiplié par l’horizon choisi.</li>
+      <li><strong>Revente :</strong> déduction d’une valeur estimée en fin de période (pourcentage ou montant fixe).</li>
+      <li><strong>Bonus / malus :</strong> bonus soustrait au coût d’achat du VE, malus ajouté au coût du thermique.</li>
+      <li><strong>Coût total :</strong> achat + fiscalité + énergie + entretien + coûts ponctuels – revente.</li>
     </ul>
+    <h3>Exemples pratiques : urbain vs route</h3>
+    <p><strong>Scénario urbain :</strong> 9 000 km/an, recharge domicile majoritaire, faible vitesse moyenne. L’électrique bénéficie souvent d’un coût énergétique et d’entretien plus bas, mais il faut vérifier l’impact du prix d’achat initial.</p>
+    <p><strong>Scénario route / autoroute :</strong> 24 000 km/an avec un mix de trajets rapides. Le coût carburant du thermique peut grimper fortement ; l’électrique peut rester compétitif si la consommation est réaliste et la recharge bien optimisée.</p>
+  </section>
+
+  <section class="card" aria-labelledby="best-practices-title">
+    <h2 id="best-practices-title">Bonnes pratiques de comparaison</h2>
+    <ol>
+      <li>Comparez toujours plusieurs horizons (3, 5, 8, 10 ans).</li>
+      <li>Créez au moins deux hypothèses (prudente et réaliste).</li>
+      <li>Évitez les consommations trop optimistes.</li>
+      <li>Intégrez systématiquement la revente.</li>
+      <li>Vérifiez les aides à la date d’achat effective.</li>
+    </ol>
+  </section>
+
+  <section class="card" aria-labelledby="faq-title">
+    <h2 id="faq-title">FAQ : comparer véhicule électrique et thermique</h2>
+    <div class="grid">
+      <p><strong>1) Ce comparateur est-il gratuit ?</strong><br>Oui, l’outil est libre d’accès et fonctionne sans compte.</p>
+      <p><strong>2) Puis-je l’utiliser sans accepter les cookies ?</strong><br>Oui, le simulateur fonctionne normalement, seule la publicité reste désactivée.</p>
+      <p><strong>3) Pourquoi le résultat change selon les années ?</strong><br>Parce que les coûts d’énergie et d’entretien sont projetés sur l’horizon choisi.</p>
+      <p><strong>4) La revente est-elle obligatoire dans le calcul ?</strong><br>Elle est fortement recommandée, car elle pèse sur le coût final.</p>
+      <p><strong>5) Le bonus écologique est-il garanti ?</strong><br>Non, il dépend de critères légaux et d’éligibilité au moment de l’achat.</p>
+      <p><strong>6) Le malus thermique varie-t-il ?</strong><br>Oui, il dépend notamment des émissions et des barèmes en vigueur.</p>
+      <p><strong>7) Quel champ influence le plus le résultat ?</strong><br>Le kilométrage annuel, puis la consommation et le prix de l’énergie.</p>
+      <p><strong>8) Peut-on comparer des véhicules d’occasion ?</strong><br>Oui, adaptez simplement le prix d’achat, l’entretien et la revente.</p>
+    </div>
   </section>
 </main>
+
 <footer class="site-footer">
   <div class="container">
     <p data-legal-short></p>
@@ -96,11 +188,28 @@
     <p>Hébergement : OVHcloud SAS – 2 rue Kellermann, 59100 Roubaix – France.</p>
   </div>
 </footer>
+
 <div id="cookie-banner" class="cookie-banner" aria-live="polite" aria-hidden="true" hidden>
-  <p>Ce site utilise des cookies publicitaires (AdSense) et de mesure d’audience. Vous pouvez accepter ou refuser. <a href="pages/politique-confidentialite.html">En savoir plus</a></p>
-  <div class="cookie-actions"><button id="cookie-accept" class="btn">Accepter</button><button id="cookie-reject" class="btn secondary">Refuser</button></div>
+  <p>Cookies non bloquants : vous pouvez accepter ou refuser l’activation publicitaire. Le simulateur reste accessible dans tous les cas.</p>
+  <div class="cookie-actions">
+    <button id="cookie-accept" class="btn">Accepter</button>
+    <button id="cookie-reject" class="btn secondary">Refuser</button>
+    <a class="btn ghost" href="pages/politique-confidentialite.html">En savoir plus</a>
+  </div>
 </div>
-<script type="application/ld+json">{"@context":"https://schema.org","@type":"WebSite","name":"Comparateur VE vs Thermique","url":"https://example.com/"}</script>
+
+<script type="application/ld+json">
+{
+  "@context":"https://schema.org",
+  "@type":"FAQPage",
+  "mainEntity":[
+    {"@type":"Question","name":"Ce comparateur est-il gratuit ?","acceptedAnswer":{"@type":"Answer","text":"Oui, l'outil est gratuit et utilisable sans compte."}},
+    {"@type":"Question","name":"Puis-je l'utiliser sans accepter les cookies ?","acceptedAnswer":{"@type":"Answer","text":"Oui, le simulateur fonctionne sans consentement publicitaire."}},
+    {"@type":"Question","name":"Pourquoi le résultat change selon les années ?","acceptedAnswer":{"@type":"Answer","text":"Le calcul intègre l'accumulation des coûts d'usage sur l'horizon choisi."}},
+    {"@type":"Question","name":"Le bonus écologique est-il garanti ?","acceptedAnswer":{"@type":"Answer","text":"Non, il dépend des règles et de l'éligibilité en vigueur."}}
+  ]
+}
+</script>
 <script src="assets/config.js"></script>
 <script src="assets/utils.js"></script>
 <script src="assets/seo.js"></script>
