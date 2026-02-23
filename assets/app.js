@@ -8,11 +8,11 @@
     if (prefix === 'ev') {
       Utils.byId('ev-consumption').value = p.evConsumption;
       Utils.byId('ev-maintenance').value = p.evMaintenance;
-      Utils.byId('ev-resale-percent').value = p.resalePercent;
+      Utils.byId('ev-resale').value = p.resalePercent;
     } else {
       Utils.byId('th-consumption').value = p.thermalConsumption;
       Utils.byId('th-maintenance').value = p.thermalMaintenance;
-      Utils.byId('th-resale-percent').value = p.resalePercent;
+      Utils.byId('th-resale').value = p.resalePercent;
     }
   }
 
@@ -103,6 +103,13 @@
 
     const be = breakEven(evData, thData);
     Utils.byId('breakeven').textContent = be ? `Rentable à partir de ${be.year} an(s), environ ${be.km.toLocaleString('fr-FR')} km.` : 'Non atteint en 10 ans.';
+
+    const summary = Utils.byId('result-summary');
+    if (summary) {
+      summary.classList.remove('result-summary');
+      void summary.offsetWidth;
+      summary.classList.add('result-summary');
+    }
 
     renderBarChart(evTotal, thTotal);
   }

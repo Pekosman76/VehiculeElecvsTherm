@@ -76,8 +76,7 @@
       <tr><td>Coût total 5 ans</td><td id="ev-total"></td><td id="th-total"></td></tr>
       <tr><td>Coût mensuel moyen</td><td id="ev-monthly"></td><td id="th-monthly"></td></tr>
     </tbody></table>
-    <p><strong id="winner"></strong> Écart : <span id="difference"></span>.</p>
-    <p id="breakeven"></p>
+    <div id="result-summary" class="result-summary"><p><strong id="winner"></strong> Écart : <span id="difference"></span>.</p><p id="breakeven"></p></div>
     <canvas id="result-chart" width="380" height="220" aria-label="Graphique comparatif" role="img"></canvas>
   </section>
   <section class="card">
@@ -93,20 +92,13 @@
   <div class="container">
     <p data-legal-short></p>
     <p><a href="pages/mentions-legales.html">Mentions légales</a> · <a href="pages/politique-confidentialite.html">Politique de confidentialité</a> · <a href="pages/contact.html">Contact</a> · <a href="#" id="manage-cookies">Gérer les cookies</a></p>
+    <p>Contact : <a href="mailto:laloumaxime951@gmail.com">laloumaxime951@gmail.com</a></p>
     <p>Hébergement : OVHcloud SAS – 2 rue Kellermann, 59100 Roubaix – France.</p>
   </div>
 </footer>
 <div id="cookie-banner" class="cookie-banner" hidden>
-  <strong>Cookies</strong>
-  <p>Nous utilisons des cookies optionnels pour la mesure d’audience et la publicité.</p>
-  <div class="cookie-actions"><button id="cookie-accept" class="btn">Accepter</button><button id="cookie-reject" class="btn secondary">Refuser</button><button id="cookie-settings" class="btn ghost">Paramétrer</button></div>
-</div>
-<div id="cookie-modal" class="cookie-modal" role="dialog" aria-modal="true" aria-labelledby="cookie-title" tabindex="-1" hidden>
-  <article><h2 id="cookie-title">Paramètres de cookies</h2>
-    <label><input type="checkbox" id="cookie-audience"> Mesure d’audience</label>
-    <label><input type="checkbox" id="cookie-advertising"> Publicité (AdSense)</label>
-    <div class="cookie-actions"><button id="cookie-save" class="btn">Enregistrer</button><button id="cookie-modal-close" class="btn secondary">Fermer</button></div>
-  </article>
+  <p>Ce site utilise des cookies (notamment Google AdSense) pour diffuser des annonces et mesurer l’audience. Vous pouvez accepter ou refuser. <a href="pages/politique-confidentialite.html">En savoir plus</a></p>
+  <div class="cookie-actions"><button id="cookie-accept" class="btn">Accepter</button><button id="cookie-reject" class="btn secondary">Refuser</button></div>
 </div>
 <script type="application/ld+json">{"@context":"https://schema.org","@type":"WebSite","name":"Comparateur VE vs Thermique","url":"https://example.com/"}</script>
 <script src="assets/config.js"></script>
