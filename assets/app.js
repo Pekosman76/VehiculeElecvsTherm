@@ -2,193 +2,183 @@
   const cfg = window.APP_CONFIG;
   if (!cfg) return;
 
-  function byId(id) {
-    return document.getElementById(id);
+  const $ = (id) => document.getElementById(id);
+
+  function n(id, fallback = 0) {
+    const v = Number($(id)?.value);
+    return Number.isFinite(v) ? v : fallback;
   }
 
-  function setByType(prefix, type) {
-    const preset = cfg.presets[type];
-    if (!preset) return;
-
-    if (prefix === 'ev') {
-      byId('ev-consumption').value = preset.evConsumption;
-      byId('ev-maintenance').value = preset.evMaintenance;
-      byId('ev-resale').value = preset.resalePercent;
-    } else {
-      byId('th-consumption').value = preset.thermalConsumption;
-      byId('th-maintenance').value = preset.thermalMaintenance;
-      byId('th-resale').value = preset.resalePercent;
-    }
+  function getResale(price, resaleType, resaleValue) {
+    return resaleType === 'percent' ? price * (resaleValue / 100) : resaleValue;
   }
 
-  function computeEnergy(km, consumption, unitPrice, annualIncrease, years) {
+  function energyCost(km, conso, unitPrice, increase, years) {
     let total = 0;
-    let dynamicPrice = Number(unitPrice);
+    let p = unitPrice;
     for (let i = 0; i < years; i += 1) {
-      total += (km / 100) * consumption * dynamicPrice;
-      dynamicPrice *= 1 + annualIncrease / 100;
+      total += (km / 100) * conso * p;
+      p *= (1 + increase / 100);
     }
     return total;
   }
 
-  function totalCost(data, years) {
-    const resale = data.resaleType === 'percent'
-      ? data.purchasePrice * (data.resaleValue / 100)
-      : data.resaleValue;
-
-    const energy = computeEnergy(
-      data.annualKm,
-      data.consumption,
-      data.energyPrice,
-      data.energyIncrease,
-      years
-    );
-
+  function total(data, years) {
+    const resale = getResale(data.price, data.resaleType, data.resaleValue);
+    const energy = energyCost(data.km, data.conso, data.energyPrice, data.increase, years);
     const maintenance = data.maintenance * years;
-    return data.purchasePrice + data.adjustment + data.oneshot + energy + maintenance - resale;
+    return {
+      energy,
+      maintenance,
+      total: data.price + data.adjustment + data.oneshot + energy + maintenance - resale
+    };
   }
 
-  function breakEven(evData, thData) {
-    const maxYears = 10;
-    for (let year = 1; year <= maxYears; year += 1) {
-      const evCost = totalCost(evData, year);
-      const thCost = totalCost(thData, year);
-      if (evCost <= thCost) {
-        return { year, km: year * evData.annualKm };
+  function findBreakEven(ev, th) {
+    for (let y = 1; y <= 10; y += 1) {
+      if (total(ev, y).total <= total(th, y).total) {
+        return { years: y, km: ev.km * y };
       }
     }
     return null;
   }
 
-  function renderBarChart(ev, th) {
-    const canvas = byId('result-chart');
+  function drawBars(evTotal, thTotal) {
+    const canvas = $('result-chart');
     if (!canvas) return;
     const ctx = canvas.getContext('2d');
-    const max = Math.max(ev, th) || 1;
-
+    const max = Math.max(evTotal, thTotal) || 1;
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-    const chartTop = 24;
-    const chartBottom = 220;
-    const chartHeight = chartBottom - chartTop;
+    const top = 30;
+    const bottom = 220;
+    const h = bottom - top;
 
-    const evHeight = (ev / max) * (chartHeight - 22);
-    const thHeight = (th / max) * (chartHeight - 22);
+    const evH = (evTotal / max) * h;
+    const thH = (thTotal / max) * h;
 
-    ctx.fillStyle = '#f1f5f9';
-    ctx.fillRect(20, chartTop, canvas.width - 40, chartHeight);
+    ctx.fillStyle = '#F6F8FA';
+    ctx.fillRect(20, top, 400, h);
 
-    const gradientEv = ctx.createLinearGradient(0, chartBottom - evHeight, 0, chartBottom);
-    gradientEv.addColorStop(0, '#1E2A78');
-    gradientEv.addColorStop(1, '#007BFF');
-    const gradientTh = ctx.createLinearGradient(0, chartBottom - thHeight, 0, chartBottom);
-    gradientTh.addColorStop(0, '#9f1239');
-    gradientTh.addColorStop(1, '#ef4444');
-
-    ctx.fillStyle = gradientEv;
-    ctx.fillRect(85, chartBottom - evHeight, 90, evHeight);
-    ctx.fillStyle = gradientTh;
-    ctx.fillRect(235, chartBottom - thHeight, 90, thHeight);
+    ctx.fillStyle = '#1E2A78';
+    ctx.fillRect(90, bottom - evH, 100, evH);
+    ctx.fillStyle = '#007BFF';
+    ctx.fillRect(250, bottom - thH, 100, thH);
 
     ctx.fillStyle = '#111';
     ctx.font = '600 14px Inter, sans-serif';
-    ctx.fillText('Électrique', 92, 245);
-    ctx.fillText('Thermique', 242, 245);
-
-    ctx.font = '500 12px Inter, sans-serif';
-    ctx.fillText(`${Math.round(ev).toLocaleString('fr-FR')} €`, 86, chartBottom - evHeight - 8);
-    ctx.fillText(`${Math.round(th).toLocaleString('fr-FR')} €`, 236, chartBottom - thHeight - 8);
+    ctx.fillText('Électrique', 98, 245);
+    ctx.fillText('Thermique', 260, 245);
+    ctx.font = '12px Inter, sans-serif';
+    ctx.fillText(`${Math.round(evTotal).toLocaleString('fr-FR')} €`, 95, bottom - evH - 8);
+    ctx.fillText(`${Math.round(thTotal).toLocaleString('fr-FR')} €`, 255, bottom - thH - 8);
   }
 
-  function updateDetails(evData, thData, years) {
-    const evEnergy = computeEnergy(evData.annualKm, evData.consumption, evData.energyPrice, evData.energyIncrease, years);
-    const thEnergy = computeEnergy(thData.annualKm, thData.consumption, thData.energyPrice, thData.energyIncrease, years);
+  function getData() {
+    const years = Math.min(10, Math.max(1, n('years', cfg.defaults.years)));
+    $('years').value = years;
 
-    byId('ev-energy-detail').textContent = Utils.toCurrency(evEnergy);
-    byId('th-energy-detail').textContent = Utils.toCurrency(thEnergy);
-    byId('ev-maint-detail').textContent = Utils.toCurrency(evData.maintenance * years);
-    byId('th-maint-detail').textContent = Utils.toCurrency(thData.maintenance * years);
-  }
+    const commonKm = n('annual-km', cfg.defaults.annualKm);
 
-  function calculateAndRender() {
-    const years = Math.min(10, Math.max(1, Number(byId('years').value || cfg.defaults.years)));
-    byId('years').value = years;
-    const annualKm = Number(byId('annual-km').value || 0);
-
-    const evData = {
-      purchasePrice: Number(byId('ev-price').value || 0),
-      adjustment: -Number(byId('ev-bonus').value || 0),
-      energyPrice: Number(byId('electricity-price').value || 0),
-      consumption: Number(byId('ev-consumption').value || 0),
-      annualKm,
-      maintenance: Number(byId('ev-maintenance').value || 0),
-      resaleType: byId('ev-resale-type').value,
-      resaleValue: Number(byId('ev-resale').value || 0),
-      oneshot: Number(byId('charger-cost').value || 0),
-      energyIncrease: Number(byId('electricity-increase').value || 0)
+    const ev = {
+      price: n('ev-price', 32000),
+      adjustment: -n('ev-bonus', cfg.defaults.ecologicalBonus),
+      energyPrice: n('electricity-price', cfg.defaults.electricityPrice),
+      conso: n('ev-consumption', 16),
+      km: commonKm,
+      maintenance: n('ev-maintenance', 350),
+      resaleType: $('ev-resale-type').value,
+      resaleValue: n('ev-resale', 45),
+      oneshot: n('charger-cost', cfg.defaults.chargerInstallCost),
+      increase: n('electricity-increase', cfg.defaults.annualElectricityIncrease)
     };
 
-    const thData = {
-      purchasePrice: Number(byId('th-price').value || 0),
-      adjustment: Number(byId('th-malus').value || 0),
-      energyPrice: Number(byId('fuel-price').value || 0),
-      consumption: Number(byId('th-consumption').value || 0),
-      annualKm,
-      maintenance: Number(byId('th-maintenance').value || 0),
-      resaleType: byId('th-resale-type').value,
-      resaleValue: Number(byId('th-resale').value || 0),
+    const th = {
+      price: n('th-price', 26000),
+      adjustment: n('th-malus', cfg.defaults.ecologicalMalus),
+      energyPrice: n('fuel-price', cfg.defaults.fuelPrice),
+      conso: n('th-consumption', 6.2),
+      km: commonKm,
+      maintenance: n('th-maintenance', 700),
+      resaleType: $('th-resale-type').value,
+      resaleValue: n('th-resale', 45),
       oneshot: 0,
-      energyIncrease: Number(byId('fuel-increase').value || 0)
+      increase: n('fuel-increase', cfg.defaults.annualFuelIncrease)
     };
 
-    const evTotal = totalCost(evData, years);
-    const thTotal = totalCost(thData, years);
+    return { years, ev, th };
+  }
 
-    byId('ev-total').textContent = Utils.toCurrency(evTotal);
-    byId('th-total').textContent = Utils.toCurrency(thTotal);
-    byId('ev-monthly').textContent = Utils.toCurrency(evTotal / (years * 12));
-    byId('th-monthly').textContent = Utils.toCurrency(thTotal / (years * 12));
+  function renderResults() {
+    const { years, ev, th } = getData();
+    const evRes = total(ev, years);
+    const thRes = total(th, years);
 
-    byId('period-label').textContent = `${years} an${years > 1 ? 's' : ''}`;
-    byId('difference').textContent = Utils.toCurrency(Math.abs(evTotal - thTotal));
-    byId('winner').textContent = evTotal <= thTotal
-      ? `Sur ${years} ans, le véhicule électrique est le plus économique.`
-      : `Sur ${years} ans, le véhicule thermique reste le plus économique.`;
+    const isEvWinner = evRes.total <= thRes.total;
+    const eco = Math.abs(evRes.total - thRes.total);
 
-    const be = breakEven(evData, thData);
-    byId('breakeven').textContent = be
-      ? `Rentable à partir de ${be.year} an(s), soit environ ${be.km.toLocaleString('fr-FR')} km.`
-      : 'Rentable à partir de… non atteint dans la limite de 10 ans avec ces hypothèses.';
+    $('result-line').textContent = `Sur ${years} ans, Électrique : ${Utils.toCurrency(evRes.total)}, Thermique : ${Utils.toCurrency(thRes.total)}, Économie : ${Utils.toCurrency(eco)} (${isEvWinner ? 'avantage VE' : 'avantage thermique'}).`;
 
-    updateDetails(evData, thData, years);
-    renderBarChart(evTotal, thTotal);
+    const be = findBreakEven(ev, th);
+    $('breakeven').textContent = be
+      ? `L’électrique devient rentable après ~${be.years} an(s) (~${be.km.toLocaleString('fr-FR')} km).`
+      : 'Pas rentable dans la limite de 10 ans avec ces hypothèses.';
+
+    $('ev-total').textContent = Utils.toCurrency(evRes.total);
+    $('th-total').textContent = Utils.toCurrency(thRes.total);
+    $('ev-energy').textContent = Utils.toCurrency(evRes.energy);
+    $('th-energy').textContent = Utils.toCurrency(thRes.energy);
+    $('ev-maint').textContent = Utils.toCurrency(evRes.maintenance);
+    $('th-maint').textContent = Utils.toCurrency(thRes.maintenance);
+    $('ev-monthly').textContent = Utils.toCurrency(evRes.total / (years * 12));
+    $('th-monthly').textContent = Utils.toCurrency(thRes.total / (years * 12));
+
+    drawBars(evRes.total, thRes.total);
+  }
+
+  function resetForm() {
+    $('years').value = cfg.defaults.years;
+    $('annual-km').value = cfg.defaults.annualKm;
+    $('ev-price').value = 32000;
+    $('th-price').value = 26000;
+    $('ev-bonus').value = cfg.defaults.ecologicalBonus;
+    $('th-malus').value = cfg.defaults.ecologicalMalus;
+    $('electricity-price').value = cfg.defaults.electricityPrice;
+    $('ev-consumption').value = 16;
+    $('fuel-price').value = cfg.defaults.fuelPrice;
+    $('th-consumption').value = 6.2;
+    $('ev-maintenance').value = 350;
+    $('th-maintenance').value = 700;
+    $('ev-resale-type').value = 'percent';
+    $('th-resale-type').value = 'percent';
+    $('ev-resale').value = 45;
+    $('th-resale').value = 45;
+    $('electricity-increase').value = cfg.defaults.annualElectricityIncrease;
+    $('fuel-increase').value = cfg.defaults.annualFuelIncrease;
+    $('charger-cost').value = cfg.defaults.chargerInstallCost;
   }
 
   document.addEventListener('DOMContentLoaded', () => {
-    if (!document.getElementById('simulator-form')) return;
+    if (!$('simulator-form')) return;
 
-    byId('years').value = cfg.defaults.years;
-    byId('annual-km').value = cfg.defaults.annualKm;
-    byId('electricity-price').value = cfg.defaults.electricityPrice;
-    byId('fuel-price').value = cfg.defaults.fuelPrice;
-    byId('ev-bonus').value = cfg.defaults.ecologicalBonus;
-    byId('th-malus').value = cfg.defaults.ecologicalMalus;
-    byId('charger-cost').value = cfg.defaults.chargerInstallCost;
-    byId('electricity-increase').value = cfg.defaults.annualElectricityIncrease;
-    byId('fuel-increase').value = cfg.defaults.annualFuelIncrease;
+    resetForm();
 
-    setByType('ev', byId('ev-type').value);
-    setByType('th', byId('th-type').value);
+    $('quick-estimate-btn').addEventListener('click', renderResults);
+    $('recalculate-btn').addEventListener('click', renderResults);
 
-    document.querySelectorAll('#simulator-form input, #simulator-form select').forEach((field) => {
-      field.addEventListener('input', calculateAndRender);
-      field.addEventListener('change', (event) => {
-        if (event.target.id === 'ev-type') setByType('ev', event.target.value);
-        if (event.target.id === 'th-type') setByType('th', event.target.value);
-        calculateAndRender();
-      });
+    $('reset-btn').addEventListener('click', () => {
+      resetForm();
+      renderResults();
     });
 
-    calculateAndRender();
+    $('toggle-advanced-btn').addEventListener('click', () => {
+      const panel = $('advanced-fields');
+      const expanded = panel.hidden;
+      panel.hidden = !expanded;
+      $('toggle-advanced-btn').setAttribute('aria-expanded', String(expanded));
+      $('toggle-advanced-btn').textContent = expanded ? 'Masquer les options avancées' : 'Affiner';
+    });
+
+    renderResults();
   });
 })();
